@@ -1,106 +1,129 @@
 @echo off
-title VNC Cleanup - RealVNC Uninstaller
-color 0C
+title VNC CLEANER - PREMIUM EDITION
+color 0A
+
+:: RUN AS ADMIN CHECK
+net session >nul 2>&1
+if %errorLevel% neq 0 (
+    echo ========================================
+    echo   HARUS RUN AS ADMINISTRATOR GOBLOK!
+    echo ========================================
+    echo.
+    echo Klik kanan - Run as administrator
+    echo.
+    pause
+    exit
+)
+
+cls
 echo ========================================
-echo    MENGHAPUS REALVNC DARI PROGRAM FILES
+echo    REALVNC DESTROYER - BY REQUEST
 echo ========================================
 echo.
-
-:: Kill semua proses VNC
-echo [!] Menghentikan proses VNC...
-taskkill /f /im vncserver.exe 2>nul
-taskkill /f /im winvnc.exe 2>nul
-taskkill /f /im vncservice.exe 2>nul
-taskkill /f /im vncserverui.exe 2>nul
-taskkill /f /im tvnserver.exe 2>nul
-taskkill /f /im uvnc_service.exe 2>nul
-
-:: Kill juga proses RealVNC spesifik
-taskkill /f /im vncserver4.exe 2>nul
-taskkill /f /im vncconfig.exe 2>nul
-taskkill /f /im vncpasswd.exe 2>nul
-
-echo [✓] Proses VNC dihentikan
+echo [!] Sabar bentar, lagi gw beresin...
 echo.
-timeout /t 2 /nobreak >nul
 
-:: Hapus folder RealVNC dari Program Files
-echo [!] Menghapus folder RealVNC dari C:\Program Files...
+:: STEP 1 - MATIIN PROSES
+echo [1/5] Matiin proses VNC...
+taskkill /f /im *vnc* /t 2>nul
+taskkill /f /im vncserver.exe /t 2>nul
+taskkill /f /im winvnc.exe /t 2>nul
+taskkill /f /im vncservice.exe /t 2>nul
+taskkill /f /im vncserverui.exe /t 2>nul
+echo OK!
+echo.
+
+:: STEP 2 - STOP SERVICE
+echo [2/5] Stop service VNC...
+sc stop vncserver 2>nul
+sc stop vncservice 2>nul
+sc stop vncserver4 2>nul
+sc delete vncserver 2>nul
+sc delete vncservice 2>nul
+sc delete vncserver4 2>nul
+echo OK!
+echo.
+
+:: STEP 3 - AMBIL ALIH PERMISSION
+echo [3/5] Ambil alih kepemilikan folder...
+takeown /f "C:\Program Files\RealVNC" /r /d y >nul 2>&1
+icacls "C:\Program Files\RealVNC" /grant administrators:F /t /q >nul 2>&1
+echo OK!
+echo.
+
+:: STEP 4 - HAPUS FOLDER
+echo [4/5] Ngehapus folder RealVNC...
 
 if exist "C:\Program Files\RealVNC" (
-    echo [DITEMUKAN] Folder RealVNC ditemukan!
+    echo Folder ditemukan! Dihapus...
     
-    :: Hapus isi folder paksa
-    takeown /f "C:\Program Files\RealVNC" /r /d y 2>nul
-    icacls "C:\Program Files\RealVNC" /grant administrators:F /t 2>nul
+    :: Hapus paksa pake cara biadab
+    rmdir /s /q "C:\Program Files\RealVNC" >nul 2>&1
     
-    :: Hapus folder
-    rmdir /s /q "C:\Program Files\RealVNC" 2>nul
+    :: Kalo masih bandel, pake DEL
+    if exist "C:\Program Files\RealVNC" (
+        del /f /s /q "C:\Program Files\RealVNC\*.*" >nul 2>&1
+        rmdir /s /q "C:\Program Files\RealVNC" >nul 2>&1
+    )
     
+    :: Kalo MASIH bandel juga
+    if exist "C:\Program Files\RealVNC" (
+        echo Folder masih ada! Pake cara ketiga...
+        rd /s /q "C:\Program Files\RealVNC" >nul 2>&1
+    )
+    
+    :: Cek hasil
     if not exist "C:\Program Files\RealVNC" (
-        echo [✓] Folder RealVNC berhasil dihapus!
+        echo [✓] BERHASIL DIHAPUS!
     ) else (
-        echo [✗] Gagal menghapus folder, coba cara kedua...
-        
-        :: Cara paksa pake del
-        del /f /s /q "C:\Program Files\RealVNC\*.*" 2>nul
-        rmdir /s /q "C:\Program Files\RealVNC" 2>nul
-        
-        if not exist "C:\Program Files\RealVNC" (
-            echo [✓] Folder RealVNC berhasil dihapus!
-        )
+        echo [✗] GAGAL! Folder masih ngebandel.
+        echo Coba restart dulu trus jalanin lagi.
     )
 ) else (
-    echo [✗] Folder RealVNC tidak ditemukan di C:\Program Files
+    echo [i] Folder ga ada di C:\Program Files\RealVNC
+    echo Cek lokasi lain...
+    
+    :: Cek lokasi alternatif
+    if exist "C:\Program Files (x86)\RealVNC" (
+        echo Folder ditemukan di Program Files (x86)!
+        rmdir /s /q "C:\Program Files (x86)\RealVNC" >nul 2>&1
+        echo [✓] Dihapus!
+    )
+    
+    if exist "%ProgramData%\RealVNC" (
+        rmdir /s /q "%ProgramData%\RealVNC" >nul 2>&1
+    )
+    
+    if exist "%AppData%\RealVNC" (
+        rmdir /s /q "%AppData%\RealVNC" >nul 2>&1
+    )
 )
-
-:: Cek juga di Program Files (x86) buat jaga-jaga
 echo.
-echo [!] Cek juga di C:\Program Files (x86)...
 
-if exist "C:\Program Files (x86)\RealVNC" (
-    echo [DITEMUKAN] Folder RealVNC ditemukan di Program Files (x86)!
-    rmdir /s /q "C:\Program Files (x86)\RealVNC" 2>nul
-    echo [✓] Folder di Program Files (x86) dihapus
-)
-
-:: Hapus juga di AppData (settingan user)
+:: STEP 5 - BERSIHIN REGISTRY
+echo [5/5] Sapu bersih registry...
+reg delete "HKLM\SOFTWARE\RealVNC" /f >nul 2>&1
+reg delete "HKCU\SOFTWARE\RealVNC" /f >nul 2>&1
+reg delete "HKLM\SOFTWARE\WOW6432Node\RealVNC" /f >nul 2>&1
+reg delete "HKLM\SYSTEM\CurrentControlSet\Services\vnc" /f >nul 2>&1
+echo OK!
 echo.
-echo [!] Bersihin juga sisa-sisa di AppData...
 
-if exist "%ProgramData%\RealVNC" (
-    rmdir /s /q "%ProgramData%\RealVNC" 2>nul
-    echo [✓] Folder ProgramData\RealVNC dihapus
-)
-
-if exist "%AppData%\RealVNC" (
-    rmdir /s /q "%AppData%\RealVNC" 2>nul
-    echo [✓] Folder AppData\RealVNC dihapus
-)
-
-if exist "%LocalAppData%\RealVNC" (
-    rmdir /s /q "%LocalAppData%\RealVNC" 2>nul
-    echo [✓] Folder LocalAppData\RealVNC dihapus
-)
-
-:: Bersihin registry (optional - comment kalo ga mau)
-echo.
-echo [!] Membersihkan registry entries...
-reg delete "HKLM\SOFTWARE\RealVNC" /f 2>nul
-reg delete "HKCU\SOFTWARE\RealVNC" /f 2>nul
-reg delete "HKLM\SOFTWARE\WOW6432Node\RealVNC" /f 2>nul
-
-echo.
+:: RESULT
 echo ========================================
-echo    CLEANUP COMPLETE!
+echo            HASIL FINAL
 echo ========================================
 echo.
-echo RealVNC telah dihapus dari:
-echo - C:\Program Files\RealVNC
-echo - C:\Program Files (x86)\RealVNC (kalo ada)
-echo - AppData folders
-echo - Registry entries
+if not exist "C:\Program Files\RealVNC" (
+    if not exist "C:\Program Files (x86)\RealVNC" (
+        echo [✓] REALVNC UDAH ILANG TOTAL DARI PC LU!
+        echo.
+        echo Udah bersih bos, gaskeun lanjut aktivitas.
+    ) else (
+        echo [⚠️] Masih ada sisa dikit, cek manual ya
+    )
+) else (
+    echo [⚠️] RealVNC masih ada, coba restart PC
+)
 echo.
-echo [✓] PC udah bersih dari RealVNC!
-echo.
-pause
+pausepause
