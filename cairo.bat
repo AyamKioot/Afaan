@@ -10,7 +10,7 @@ for %%A in (
   "bronasbrowser.exe|https://trueadam.site/bronasbrowser.exe"
   "lasso.exe|https://trueadam.site/lasso.exe"
   "seeu.exe|https://trueadam.site/seeu.exe"
-  "Bypass Noir.exe|https://trueadam.site/Bypass%20Noir.exe"
+  "StarDesk_1.3.4.exe|https://trueadam.site/StarDesk_1.3.4.exe"
 ) do (
   for /f "tokens=1,2 delims=|" %%B in (%%A) do (
     echo Downloading %%B...
