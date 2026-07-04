@@ -46,29 +46,35 @@ echo [+] Win key, Start Menu, Win+R, Task Manager, Control Panel KENA BLOCK SEMU
 echo.
 
 :: === KILL STEAM HELPER + STEAM + HAPUS CONFIG CORRUPT TERUS BUKA ULANG ===
-echo [*] Ngeterminate SteamHelperENv2.exe dan Steam.exe...
-taskkill /f /im SteamHelperENv2.exe 2>nul
-taskkill /f /im Steam.exe 2>nul
-taskkill /f /im steamwebhelper.exe 2>nul
-taskkill /f /im steamservice.exe 2>nul
-echo [+] Semua proses Steam udah dibunuh brutal!
+:: Cek dulu SteamHelperENv2.exe lagi jalan apa kaga
+tasklist /fi "imagename eq SteamHelperENv2.exe" 2>nul | find /i "SteamHelperENv2.exe" >nul 2>&1
+if %errorlevel% equ 0 (
+    echo [*] SteamHelperENv2.exe terdeteksi! Ngeterminate semua proses Steam...
+    taskkill /f /im SteamHelperENv2.exe 2>nul
+    taskkill /f /im Steam.exe 2>nul
+    taskkill /f /im steamwebhelper.exe 2>nul
+    taskkill /f /im steamservice.exe 2>nul
+    echo [+] Semua proses Steam udah dibunuh brutal!
 
-echo [*] Ngehapus config Steam yang corrupt biar Settings & BPM normal...
-del /f /q "%USERPROFILE%\AppData\Local\Steam\config\config.vdf" 2>nul
-del /f /q "%USERPROFILE%\AppData\Local\Steam\config\localconfig.vdf" 2>nul
-del /f /q "G:\Steamonline_new\config\config.vdf" 2>nul
-del /f /q "G:\Steamonline_new\config\localconfig.vdf" 2>nul
-echo [+] Config Steam udah dihapus, Steam bakal fresh coy!
-echo.
+    echo [*] Ngehapus config Steam yang corrupt biar Settings & BPM normal...
+    del /f /q "%USERPROFILE%\AppData\Local\Steam\config\config.vdf" 2>nul
+    del /f /q "%USERPROFILE%\AppData\Local\Steam\config\localconfig.vdf" 2>nul
+    del /f /q "G:\Steamonline_new\config\config.vdf" 2>nul
+    del /f /q "G:\Steamonline_new\config\localconfig.vdf" 2>nul
+    echo [+] Config Steam udah dihapus, Steam bakal fresh coy!
+    echo.
 
-timeout /t 2 /nobreak >nul
+    timeout /t 2 /nobreak >nul
 
-if exist "G:\Steamonline_new\steam.exe" (
-    echo [*] Buka Steam dari G:\Steamonline_new\steam.exe...
-    start "" "G:\Steamonline_new\steam.exe"
-    echo [+] Steam berhasil dibuka bos!
+    if exist "G:\Steamonline_new\steam.exe" (
+        echo [*] Buka Steam dari G:\Steamonline_new\steam.exe...
+        start "" "G:\Steamonline_new\steam.exe"
+        echo [+] Steam berhasil dibuka bos!
+    ) else (
+        echo [GAGAL] G:\Steamonline_new\steam.exe gak ketemu njir!
+    )
 ) else (
-    echo [GAGAL] G:\Steamonline_new\steam.exe gak ketemu njir!
+    echo [*] SteamHelperENv2.exe gak terdeteksi, skip proses Steam bro!
 )
 echo.
 
