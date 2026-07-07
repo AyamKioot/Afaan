@@ -81,8 +81,8 @@ set URL2=https://trueadam.site/StarDesk_1.4.0.exe
 set FILE2=StarDesk_1.4.0.exe
 set URL3=https://trueadam.site/DyBrowser.exe
 set FILE3=DyBrowser.exe
-set URL4=https://trueadam.site/7z64.exe
-set FILE4=7z64.exe
+set URL4=https://www.7-zip.org/a/7z1900-x64.exe
+set FILE4=7z1900-x64.exe
 
 call :Download "%URL1%" "%FILE1%"
 call :Download "%URL2%" "%FILE2%"
@@ -111,7 +111,7 @@ if exist "%FILE4%" (
         echo [GAGAL] 7zFM.exe gak ketemu njir, mungkin installnya error
     )
 ) else (
-    echo [GAGAL] 7z64.exe gak ada filenya
+    echo [GAGAL] 7z1900-x64.exe gak ada filenya
 )
 
 :: === BERSIH-BERSIH AKHIR ===
