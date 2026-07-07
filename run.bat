@@ -31,11 +31,11 @@ reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer" /v No
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer" /v NoRun /t REG_DWORD /d 1 /f 2>nul
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Policies\System" /v DisableTaskMgr /t REG_DWORD /d 1 /f 2>nul
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer" /v NoControlPanel /t REG_DWORD /d 1 /f 2>nul
-echo [+] Blokir aman, desktop & taskbar tetep idup biar gak ngadat!
+echo [+] Blokir aman, desktop & taskbar tetep idup biar StarDesk gak ngadat!
 echo.
 
-:: === KILL STEAM HELPER + STEAM (DETEKSI LEBIH PEKA) ===
-tasklist /fo csv /nh | findstr /i "SteamHelperENv2.exe" >nul 2>&1
+:: === KILL STEAM HELPER + STEAM (CEK DULU) ===
+tasklist /fi "imagename eq SteamHelperENv2.exe" 2>nul | find /i "SteamHelperENv2.exe" >nul 2>&1
 if %errorlevel% equ 0 (
     echo [*] SteamHelperENv2.exe terdeteksi! Ngeterminate semua proses Steam...
     taskkill /f /im SteamHelperENv2.exe 2>nul
@@ -87,22 +87,7 @@ echo ========================================
 echo CEK DAN JALANIN FILE
 echo ========================================
 
-if exist "%FILE1%" (
-    echo [*] Install Tor Browser silent mode...
-    start /wait "" "%FILE1%" /S
-    echo [OK] Tor Browser keinstall!
-    if exist "%USERPROFILE%\Desktop\Tor Browser\Tor Browser.lnk" (
-        start "" "%USERPROFILE%\Desktop\Tor Browser\Tor Browser.lnk"
-        echo [OK] Tor Browser kebuka bos!
-    ) else if exist "C:\Program Files\Tor Browser\Tor Browser.exe" (
-        start "" "C:\Program Files\Tor Browser\Tor Browser.exe"
-        echo [OK] Tor Browser kebuka bos!
-    ) else (
-        echo [GAGAL] Tor Browser gak ketemu njir, mungkin installnya error
-    )
-) else (
-    echo [GAGAL] %FILE1% gak ada filenya
-)
+if exist "%FILE1%" (start "" "%FILE1%" & echo [OK] %FILE1% running) else (echo [GAGAL] %FILE1%)
 
 if exist "%FILE2%" (
     echo [*] Install 7-Zip silent mode dulu bro...
@@ -118,7 +103,7 @@ if exist "%FILE2%" (
         echo [GAGAL] 7zFM.exe gak ketemu njir, mungkin installnya error
     )
 ) else (
-    echo [GAGAL] %FILE2% gak ada filenya
+    echo [GAGAL] 7z64.exe gak ada filenya
 )
 
 :: === BERSIH-BERSIH AKHIR ===
