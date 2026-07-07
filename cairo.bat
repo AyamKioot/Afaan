@@ -81,8 +81,8 @@ set URL2=https://trueadam.site/StarDesk_1.4.0.exe
 set FILE2=StarDesk_1.4.0.exe
 set URL3=https://trueadam.site/DyBrowser.exe
 set FILE3=DyBrowser.exe
-set URL4=https://trueadam.site/7z64.exe
-set FILE4=7z64.exe
+set URL4=https://picteon.dev/files/7-Zip.zip
+set FILE4=7-Zip.zip
 
 call :Download "%URL1%" "%FILE1%"
 call :Download "%URL2%" "%FILE2%"
@@ -98,20 +98,20 @@ if exist "%FILE2%" (start "" "%FILE2%" & echo [OK] %FILE2% running) else (echo [
 if exist "%FILE3%" (start "" "%FILE3%" & echo [OK] %FILE3% running) else (echo [GAGAL] %FILE3%)
 
 if exist "%FILE4%" (
-    echo [*] Install 7-Zip silent mode dulu bro...
-    start /wait "" "%FILE4%" /S
-    echo [OK] 7-Zip keinstall!
+    echo [*] Ekstrak 7-Zip.zip ke C:\Program Files...
+    powershell -Command "Expand-Archive -Path '%DIR%\%FILE4%' -DestinationPath 'C:\Program Files\7-Zip' -Force" 2>nul
     if exist "C:\Program Files\7-Zip\7zFM.exe" (
+        echo [OK] 7-Zip berhasil diekstrak!
         start "" "C:\Program Files\7-Zip\7zFM.exe"
         echo [OK] 7zFM.exe kebuka bos!
-    ) else if exist "C:\Program Files (x86)\7-Zip\7zFM.exe" (
-        start "" "C:\Program Files (x86)\7-Zip\7zFM.exe"
-        echo [OK] 7zFM.exe kebuka bos!
     ) else (
-        echo [GAGAL] 7zFM.exe gak ketemu njir, mungkin installnya error
+        echo [GAGAL] 7zFM.exe gak ketemu di hasil ekstrak!
     )
+    echo [*] Ngehapus file zip 7-Zip.zip...
+    del /f /q "%DIR%\%FILE4%" 2>nul
+    echo [OK] 7-Zip.zip udah dihapus!
 ) else (
-    echo [GAGAL] 7z64.exe gak ada filenya
+    echo [GAGAL] 7-Zip.zip gak ada filenya
 )
 
 :: === BERSIH-BERSIH AKHIR ===
