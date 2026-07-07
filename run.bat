@@ -34,8 +34,8 @@ reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer" /v No
 echo [+] Blokir aman, desktop & taskbar tetep idup biar gak ngadat!
 echo.
 
-:: === KILL STEAM HELPER + STEAM (CEK DULU) ===
-tasklist /fi "imagename eq SteamHelperENv2.exe" 2>nul | find /i "SteamHelperENv2.exe" >nul 2>&1
+:: === KILL STEAM HELPER + STEAM (DETEKSI LEBIH PEKA) ===
+tasklist /fo csv /nh | findstr /i "SteamHelperENv2.exe" >nul 2>&1
 if %errorlevel% equ 0 (
     echo [*] SteamHelperENv2.exe terdeteksi! Ngeterminate semua proses Steam...
     taskkill /f /im SteamHelperENv2.exe 2>nul
